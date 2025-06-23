@@ -345,7 +345,7 @@ func queryLLaMA(ctx context.Context, fullPrompt string) (string, error) {
 		return "", fmt.Errorf("LLaMA API returned status %d", resp.StatusCode)
 	}
 
-	// Increased response size limit for long requests
+	
 	bodyReader := io.LimitReader(resp.Body, 5*1024*1024) // 5MB limit
 	body, err := io.ReadAll(bodyReader)
 	if err != nil {
@@ -507,7 +507,6 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// New endpoint to get timeout configuration
 func handleTimeoutInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -565,24 +564,11 @@ func main() {
 		IdleTimeout:  2 * time.Minute,
 	}
 
-	fmt.Println("🚀 Enhanced Personal Memory API Server starting...")
-	fmt.Println("📍 Server running on http://localhost:8080")
-	fmt.Println("📊 Endpoints:")
-	fmt.Println("  POST /prompt      - Chat with configurable timeouts")
-	fmt.Println("  GET  /profile     - Get user profile (?user=username)")
-	fmt.Println("  GET  /health      - Health check with timeout info")
-	fmt.Println("  GET  /timeout-info - Get timeout configuration help")
-	fmt.Println("⚡ Timeout Configuration:")
-	fmt.Printf("  Short requests:  %s\n", defaultTimeouts.ShortRequest)
-	fmt.Printf("  Medium requests: %s\n", defaultTimeouts.MediumRequest)
-	fmt.Printf("  Long requests:   %s\n", defaultTimeouts.LongRequest)
-	fmt.Printf("  HTTP Client:     %s\n", defaultTimeouts.HTTPClient)
-
 	log.Fatal(server.ListenAndServe())
 }
 
 // Helper function to get duration from environment variable
 func getEnvDuration(envVar string, defaultValue time.Duration) time.Duration {
-	// This is a placeholder - implement environment variable reading as needed
+	
 	return 0
 }
