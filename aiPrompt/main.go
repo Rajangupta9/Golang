@@ -120,7 +120,7 @@ func (ms *MemoryStore) addConversation(username, prompt, response string) {
 }
 
 // Extract personal information from conversations
-func (ms *MemoryStore) extractPersonalInfo(user *UserProfile, prompt, response string) {
+func (ms *MemoryStore) extractPersonalInfo(user *UserProfile, prompt, _ string) {
 	// Simple keyword-based extraction (can be enhanced with NLP)
 	personalKeywords := []string{"my name is", "i am", "i like", "i work", "i live", "my job", "my hobby"}
 

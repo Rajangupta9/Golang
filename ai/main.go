@@ -150,7 +150,7 @@ func (ms *MemoryStore) extractPersonalInfo(user *UserProfile, prompt, _ string) 
 			}
 		}
 	}
-
+     
 	if len(user.PersonalFacts) > 20 {
 		user.PersonalFacts = user.PersonalFacts[len(user.PersonalFacts)-20:]
 	}
@@ -312,7 +312,7 @@ func queryLLaMA(ctx context.Context, fullPrompt string) (string, error) {
 	url := "http://localhost:11434/api/generate"
 
 	requestBody, err := json.Marshal(OllamaRequest{
-		Model:  "llama3",
+		Model:  "llama3.2:1b",
 		Prompt: fullPrompt,
 		Stream: false,
 	})
@@ -345,7 +345,7 @@ func queryLLaMA(ctx context.Context, fullPrompt string) (string, error) {
 		return "", fmt.Errorf("LLaMA API returned status %d", resp.StatusCode)
 	}
 
-	
+	// Increased response size limit for long requests
 	bodyReader := io.LimitReader(resp.Body, 5*1024*1024) // 5MB limit
 	body, err := io.ReadAll(bodyReader)
 	if err != nil {
@@ -490,23 +490,24 @@ func handleUserProfile(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(stats)
 }
 
-func handleHealth(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+// func handleHealth(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"status":    "healthy",
-		"timestamp": time.Now().Format(time.RFC3339),
-		"users":     len(memoryStore.users),
-		"timeouts": map[string]string{
-			"short_requests":  memoryStore.timeouts.ShortRequest.String(),
-			"medium_requests": memoryStore.timeouts.MediumRequest.String(),
-			"long_requests":   memoryStore.timeouts.LongRequest.String(),
-			"http_client":     memoryStore.timeouts.HTTPClient.String(),
-		},
-	})
-}
+// 	json.NewEncoder(w).Encode(map[string]interface{}{
+// 		"status":    "healthy",
+// 		"timestamp": time.Now().Format(time.RFC3339),
+// 		"users":     len(memoryStore.users),
+// 		"timeouts": map[string]string{
+// 			"short_requests":  memoryStore.timeouts.ShortRequest.String(),
+// 			"medium_requests": memoryStore.timeouts.MediumRequest.String(),
+// 			"long_requests":   memoryStore.timeouts.LongRequest.String(),
+// 			"http_client":     memoryStore.timeouts.HTTPClient.String(),
+// 		},
+// 	})
+// }
 
+// New endpoint to get timeout configuration
 func handleTimeoutInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -554,7 +555,6 @@ func main() {
 
 	http.HandleFunc("/prompt", handlePrompt)
 	http.HandleFunc("/profile", handleUserProfile)
-	http.HandleFunc("/health", handleHealth)
 	http.HandleFunc("/timeout-info", handleTimeoutInfo)
 
 	server := &http.Server{
@@ -564,11 +564,20 @@ func main() {
 		IdleTimeout:  2 * time.Minute,
 	}
 
+	fmt.Println("Enhanced Personal Memory API Server starting...")
+	fmt.Println("Server running on http://localhost:8080")
+	
+	fmt.Println("Timeout Configuration:")
+	fmt.Printf("  Short requests:  %s\n", defaultTimeouts.ShortRequest)
+	fmt.Printf("  Medium requests: %s\n", defaultTimeouts.MediumRequest)
+	fmt.Printf("  Long requests:   %s\n", defaultTimeouts.LongRequest)
+	fmt.Printf("  HTTP Client:     %s\n", defaultTimeouts.HTTPClient)
+
 	log.Fatal(server.ListenAndServe())
 }
 
 // Helper function to get duration from environment variable
 func getEnvDuration(envVar string, defaultValue time.Duration) time.Duration {
-	
+
 	return 0
 }
