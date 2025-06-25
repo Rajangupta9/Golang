@@ -1,0 +1,429 @@
+package prompthandle
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"regexp"
+	"strings"
+	"time"
+)
+
+// Request/Response structures
+type LLaMARequest struct {
+	Model  string `json:"model"`
+	Prompt string `json:"prompt"`
+	Stream bool   `json:"stream"`
+}
+
+type LLaMAResponse struct {
+	Response string `json:"response"`
+}
+
+type DynamicDataRequest struct {
+	User         string                 `json:"user"`
+	Data         map[string]interface{} `json:"data"`
+	OutputFormat string                 `json:"output_format"` // JSON structure template
+	Instructions string                 `json:"instructions"`  // Additional processing instructions
+}
+
+type ProcessedResponse struct {
+	User           string                 `json:"user"`
+	OriginalData   map[string]interface{} `json:"original_data"`
+	ProcessedData  map[string]interface{} `json:"processed_data"`
+	LLaMAResponse  string                 `json:"llama_response"`
+	Success        bool                   `json:"success"`
+	Error          string                 `json:"error,omitempty"`
+	ProcessedAt    time.Time              `json:"processed_at"`
+}
+
+// JSON extraction and validation
+type JSONExtractor struct {
+	patterns []*regexp.Regexp
+}
+
+func NewJSONExtractor() *JSONExtractor {
+	patterns := []*regexp.Regexp{
+		regexp.MustCompile(`\{[\s\S]*\}`),           // Match {...}
+		regexp.MustCompile(`\[[\s\S]*\]`),           // Match [...]
+		regexp.MustCompile(`(?s)\{.*\}`),            // Match multiline {...}
+		regexp.MustCompile(`(?s)\[.*\]`),            // Match multiline [...]
+		regexp.MustCompile("(?s)```json\\s*([\\s\\S]*?)\\s*```"), // Match ```json ... ```
+		regexp.MustCompile("(?s)```\\s*([\\s\\S]*?)\\s*```"),     // Match ``` ... ```
+	}
+	
+	return &JSONExtractor{patterns: patterns}
+}
+
+func (je *JSONExtractor) ExtractJSON(response string) (map[string]interface{}, error) {
+	response = strings.TrimSpace(response)
+	
+	// Try to parse directly first
+	var result map[string]interface{}
+	if err := json.Unmarshal([]byte(response), &result); err == nil {
+		return result, nil
+	}
+	
+	// Try to extract JSON using patterns
+	for _, pattern := range je.patterns {
+		matches := pattern.FindStringSubmatch(response)
+		for _, match := range matches {
+			cleanMatch := strings.TrimSpace(match)
+			if strings.HasPrefix(cleanMatch, "```json") {
+				// Extract content between ```json and ```
+				lines := strings.Split(cleanMatch, "\n")
+				if len(lines) > 1 {
+					cleanMatch = strings.Join(lines[1:len(lines)-1], "\n")
+				}
+			}
+			
+			var jsonData map[string]interface{}
+			if err := json.Unmarshal([]byte(cleanMatch), &jsonData); err == nil {
+				return jsonData, nil
+			}
+		}
+	}
+	
+	return nil, fmt.Errorf("could not extract valid JSON from response")
+}
+
+// LLaMA query function with better error handling
+func queryLLaMA(prompt string) (string, error) {
+	url := "http://localhost:11434/api/generate"
+	
+	requestBody, err := json.Marshal(LLaMARequest{
+		Model:  "llama3",
+		Prompt: prompt,
+		Stream: false,
+	})
+	
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal request: %v", err)
+	}
+	
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody))
+	if err != nil {
+		return "", fmt.Errorf("error making request to ollama: %v", err)
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("ollama returned status: %d", resp.StatusCode)
+	}
+	
+	var ollamaResp LLaMAResponse
+	if err := json.NewDecoder(resp.Body).Decode(&ollamaResp); err != nil {
+		return "", fmt.Errorf("failed to decode ollama response: %v", err)
+	}
+	
+	return ollamaResp.Response, nil
+}
+
+// Build dynamic prompt based on user data and requirements
+func buildDynamicPrompt(data map[string]interface{}, outputFormat, instructions string) string {
+	var prompt strings.Builder
+	
+	prompt.WriteString("You are a data processing assistant. ")
+	prompt.WriteString("Process the following data and return ONLY a valid JSON response.\n\n")
+	
+	// Add user data
+	prompt.WriteString("INPUT DATA:\n")
+	dataJSON, _ := json.MarshalIndent(data, "", "  ")
+	prompt.WriteString(string(dataJSON))
+	prompt.WriteString("\n\n")
+	
+	// Add output format if provided
+	if outputFormat != "" {
+		prompt.WriteString("REQUIRED OUTPUT FORMAT:\n")
+		prompt.WriteString(outputFormat)
+		prompt.WriteString("\n\n")
+	}
+	
+	// Add specific instructions
+	if instructions != "" {
+		prompt.WriteString("INSTRUCTIONS:\n")
+		prompt.WriteString(instructions)
+		prompt.WriteString("\n\n")
+	}
+	
+	// Add general guidelines
+	prompt.WriteString("GUIDELINES:\n")
+	prompt.WriteString("- Return ONLY valid JSON, no additional text or explanations\n")
+	prompt.WriteString("- Ensure all JSON keys are properly quoted\n")
+	prompt.WriteString("- Include all relevant data from the input\n")
+	prompt.WriteString("- Use appropriate data types (strings, numbers, booleans, arrays, objects)\n")
+	prompt.WriteString("- If you need to transform or categorize data, do so logically\n\n")
+	
+	prompt.WriteString("JSON Response:")
+	
+	return prompt.String()
+}
+
+// Main handler for dynamic data processing
+func handleDynamicData(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	
+	if r.Method != http.MethodPost {
+		http.Error(w, `{"error": "Only POST method allowed"}`, http.StatusMethodNotAllowed)
+		return
+	}
+	
+	var req DynamicDataRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error": "Invalid JSON request"}`, http.StatusBadRequest)
+		return
+	}
+	
+	if req.User == "" || len(req.Data) == 0 {
+		http.Error(w, `{"error": "User and data are required"}`, http.StatusBadRequest)
+		return
+	}
+	
+	// Build prompt for LLaMA
+	prompt := buildDynamicPrompt(req.Data, req.OutputFormat, req.Instructions)
+	
+	// Query LLaMA
+	llamaResponse, err := queryLLaMA(prompt)
+	if err != nil {
+		response := ProcessedResponse{
+			User:          req.User,
+			OriginalData:  req.Data,
+			LLaMAResponse: "",
+			Success:       false,
+			Error:         fmt.Sprintf("LLaMA query failed: %v", err),
+			ProcessedAt:   time.Now(),
+		}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+	
+	// Extract JSON from LLaMA response
+	extractor := NewJSONExtractor()
+	processedData, err := extractor.ExtractJSON(llamaResponse)
+	if err != nil {
+		response := ProcessedResponse{
+			User:          req.User,
+			OriginalData:  req.Data,
+			LLaMAResponse: llamaResponse,
+			Success:       false,
+			Error:         fmt.Sprintf("JSON extraction failed: %v", err),
+			ProcessedAt:   time.Now(),
+		}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+	
+	// Save processed data to file
+	filename := fmt.Sprintf("%s_processed.json", req.User)
+	if fileData, err := json.MarshalIndent(processedData, "", "  "); err == nil {
+		os.WriteFile(filename, fileData, 0644)
+	}
+	
+	// Return successful response
+	response := ProcessedResponse{
+		User:          req.User,
+		OriginalData:  req.Data,
+		ProcessedData: processedData,
+		LLaMAResponse: llamaResponse,
+		Success:       true,
+		ProcessedAt:   time.Now(),
+	}
+	
+	json.NewEncoder(w).Encode(response)
+}
+
+// Handler for processing resume data specifically
+func handleResumeProcessing(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	
+	if r.Method != http.MethodPost {
+		http.Error(w, `{"error": "Only POST method allowed"}`, http.StatusMethodNotAllowed)
+		return
+	}
+	
+	type ResumeRequest struct {
+		User       string `json:"user"`
+		ResumeText string `json:"resume_text"`
+	}
+	
+	var req ResumeRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error": "Invalid JSON request"}`, http.StatusBadRequest)
+		return
+	}
+	
+	if req.User == "" || req.ResumeText == "" {
+		http.Error(w, `{"error": "User and resume_text are required"}`, http.StatusBadRequest)
+		return
+	}
+	
+	// Define resume output format
+	outputFormat := `{
+  "personal_info": {
+    "name": "string",
+    "title": "string",
+    "email": "string",
+    "phone": "string",
+    "location": "string",
+    "github": "string",
+    "linkedin": "string"
+  },
+  "summary": "string",
+  "education": [
+    {
+      "degree": "string",
+      "institution": "string",
+      "location": "string",
+      "duration": "string"
+    }
+  ],
+  "skills": {
+    "backend": ["string"],
+    "frontend": ["string"],
+    "other": ["string"],
+    "soft_skills": ["string"]
+  },
+  "projects": [
+    {
+      "name": "string",
+      "live_demo": "string",
+      "github": "string",
+      "description": ["string"],
+      "tech_stack": ["string"]
+    }
+  ],
+  "achievements": [
+    {
+      "platform": "string",
+      "description": "string",
+      "link": "string"
+    }
+  ],
+  "interests": ["string"]
+}`
+	
+	instructions := "Extract and structure all information from the resume text. Categorize skills appropriately. Include all projects with their descriptions and tech stacks. Extract achievements and interests if mentioned."
+	
+	// Create dynamic data request
+	dataMap := map[string]interface{}{
+		"resume_text": req.ResumeText,
+	}
+	
+	dynamicReq := DynamicDataRequest{
+		User:         req.User,
+		Data:         dataMap,
+		OutputFormat: outputFormat,
+		Instructions: instructions,
+	}
+	
+	// Process using the dynamic handler logic
+	prompt := buildDynamicPrompt(dynamicReq.Data, dynamicReq.OutputFormat, dynamicReq.Instructions)
+	
+	llamaResponse, err := queryLLaMA(prompt)
+	if err != nil {
+		http.Error(w, fmt.Sprintf(`{"error": "LLaMA query failed: %v"}`, err), http.StatusInternalServerError)
+		return
+	}
+	
+	extractor := NewJSONExtractor()
+	processedData, err := extractor.ExtractJSON(llamaResponse)
+	if err != nil {
+		http.Error(w, fmt.Sprintf(`{"error": "JSON extraction failed: %v"}`, err), http.StatusInternalServerError)
+		return
+	}
+	
+	// Save processed resume
+	filename := fmt.Sprintf("%s_resume.json", req.User)
+	if fileData, err := json.MarshalIndent(processedData, "", "  "); err == nil {
+		os.WriteFile(filename, fileData, 0644)
+	}
+	
+	response := ProcessedResponse{
+		User:          req.User,
+		OriginalData:  dataMap,
+		ProcessedData: processedData,
+		LLaMAResponse: llamaResponse,
+		Success:       true,
+		ProcessedAt:   time.Now(),
+	}
+	
+	json.NewEncoder(w).Encode(response)
+}
+
+// Handler for getting processed data
+func handleGetProcessedData(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	
+	user := r.URL.Query().Get("user")
+	if user == "" {
+		http.Error(w, `{"error": "User parameter required"}`, http.StatusBadRequest)
+		return
+	}
+	
+	filename := fmt.Sprintf("%s_processed.json", user)
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		http.Error(w, `{"error": "No processed data found for user"}`, http.StatusNotFound)
+		return
+	}
+	
+	var processedData map[string]interface{}
+	if err := json.Unmarshal(data, &processedData); err != nil {
+		http.Error(w, `{"error": "Invalid processed data file"}`, http.StatusInternalServerError)
+		return
+	}
+	
+	response := map[string]interface{}{
+		"user": user,
+		"data": processedData,
+		"retrieved_at": time.Now(),
+	}
+	
+	json.NewEncoder(w).Encode(response)
+}
+
+func main() {
+	http.HandleFunc("/process-data", handleDynamicData)
+	http.HandleFunc("/process-resume", handleResumeProcessing)
+	http.HandleFunc("/get-data", handleGetProcessedData)
+	
+	port := "5000"
+	fmt.Printf("Dynamic LLaMA JSON Handler Server starting on port %s\n", port)
+	fmt.Println("Endpoints:")
+	fmt.Println("  POST /process-data - Process any dynamic data with LLaMA")
+	fmt.Println("  POST /process-resume - Process resume text specifically")
+	fmt.Println("  GET /get-data?user=username - Get processed data for user")
+	fmt.Println("\nExample request for /process-data:")
+	fmt.Println(`{
+  "user": "john_doe",
+  "data": {
+    "name": "John Doe",
+    "skills": "Python, Go, JavaScript",
+    "experience": "5 years in backend development"
+  },
+  "output_format": "{\"name\": \"string\", \"skills\": [\"string\"], \"experience_years\": number}",
+  "instructions": "Parse skills into an array and extract years of experience as a number"
+}`)
+	
+	log.Fatal(http.ListenAndServe(":"+port, nil))
+}

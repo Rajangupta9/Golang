@@ -1,0 +1,465 @@
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"strings"
+	"sync"
+)
+
+type OllamaRequest struct {
+	Model  string `json:"model"`
+	Prompt string `json:"prompt"`
+	Stream bool   `json:"stream"`
+}
+
+type OllamaResponse struct {
+	Response string `json:"response"`
+}
+
+type UserPrompt struct {
+	Prompt string `json:"prompt"`
+	User   string `json:"user"`
+}
+
+type User struct {
+	User string `json:"user"`
+}
+
+type ComponentResult struct {
+	ComponentType string      `json:"component_type"`
+	Data          interface{} `json:"data"`
+	Error         error       `json:"error,omitempty"`
+}
+
+type ProcessingContext struct {
+	UserData     string
+	UserPrompt   string
+	ComponentMap map[string]string
+}
+
+func ReadFile(filename string) string {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return ""
+	}
+	return string(data)
+}
+
+func WriteFile(filename string, data string) bool {
+	prevData := ReadFile(filename)
+	file, err := os.Create(filename)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return false
+	}
+	defer file.Close()
+
+	var finalData string
+	if len(prevData) > 1 {
+		finalData = prevData + "\n" + data
+	} else {
+		finalData = data
+	}
+
+	_, err = file.WriteString(finalData)
+	if err != nil {
+		fmt.Println("Error writing to file:", err)
+		return false
+	}
+	return true
+}
+
+func setupCORS(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+}
+
+func initializeComponentPrompts() map[string]string {
+	return map[string]string{
+		"profile": `Extract profile information from the following data and format as JSON:
+Required fields: name, title/desc, company, mobile, email
+Data: %s
+Return only JSON format with extracted profile information.`,
+
+		"about": `Extract about/description information from the following data:
+Look for professional summary, bio, or description sections.
+Data: %s
+Return only a brief professional description (max 150 words).`,
+
+		"contact": `Extract contact information from the following data:
+Look for phone numbers, emails, addresses, locations.
+Data: %s
+Return JSON with contact details including mobile, email, and address if available.`,
+
+		"skills": `Extract technical skills and competencies from the following data:
+Look for programming languages, frameworks, tools, technologies.
+Data: %s
+Return JSON array of skills categorized by type (backend, frontend, other).`,
+
+		"social": `Extract social media links and professional profiles from the following data:
+Look for LinkedIn, GitHub, Twitter, Facebook, Instagram profiles.
+Data: %s
+Return JSON array of social links with platform type and URL.`,
+
+		"experience": `Extract work experience and projects from the following data:
+Look for job roles, projects, achievements, companies.
+Data: %s
+Return JSON with work experience and key projects.`,
+	}
+}
+
+func processComponent(componentType string, prompt string, userData string, results chan<- ComponentResult, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	fullPrompt := fmt.Sprintf(prompt, userData)
+	
+	// Limit prompt size for ollama 3.2:1b
+	if len(fullPrompt) > 1500 {
+		fullPrompt = fullPrompt[:1500] + "..."
+	}
+
+	response, err := queryLLaMA(fullPrompt)
+	if err != nil {
+		results <- ComponentResult{
+			ComponentType: componentType,
+			Data:          nil,
+			Error:         err,
+		}
+		return
+	}
+
+	results <- ComponentResult{
+		ComponentType: componentType,
+		Data:          response,
+		Error:         nil,
+	}
+}
+
+func processUserDataInComponents(userData string, userPrompt string) (map[string]interface{}, error) {
+	componentPrompts := initializeComponentPrompts()
+	results := make(chan ComponentResult, len(componentPrompts))
+	var wg sync.WaitGroup
+
+	// Process each component concurrently
+	for componentType, prompt := range componentPrompts {
+		wg.Add(1)
+		go processComponent(componentType, prompt, userData+" "+userPrompt, results, &wg)
+	}
+
+	// Wait for all goroutines to complete
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	// Collect results
+	componentData := make(map[string]interface{})
+	for result := range results {
+		if result.Error != nil {
+			fmt.Printf("Error processing %s: %v\n", result.ComponentType, result.Error)
+			continue
+		}
+		componentData[result.ComponentType] = result.Data
+	}
+
+	return componentData, nil
+}
+
+func buildDigitalCardResponse(componentData map[string]interface{}) map[string]interface{} {
+	template := ReadFile("template.json")
+	
+	var templateData map[string]interface{}
+	if err := json.Unmarshal([]byte(template), &templateData); err != nil {
+		fmt.Printf("Error parsing template: %v\n", err)
+		return nil
+	}
+
+	// Extract QR codes content
+	qrCodes, ok := templateData["qr_codes"].([]interface{})
+	if !ok || len(qrCodes) == 0 {
+		return templateData
+	}
+
+	qrCode := qrCodes[0].(map[string]interface{})
+	content, ok := qrCode["content"].([]interface{})
+	if !ok {
+		return templateData
+	}
+
+	// Update template with processed component data
+	for i, component := range content {
+		comp := component.(map[string]interface{})
+		componentType := comp["component"].(string)
+
+		switch componentType {
+		case "profile":
+			if profileData, exists := componentData["profile"]; exists {
+				updateProfileComponent(comp, profileData.(string))
+			}
+		case "text_desc":
+			if aboutData, exists := componentData["about"]; exists {
+				updateAboutComponent(comp, aboutData.(string))
+			}
+		case "contact":
+			if contactData, exists := componentData["contact"]; exists {
+				updateContactComponent(comp, contactData.(string))
+			}
+		case "social_link":
+			if socialData, exists := componentData["social"]; exists {
+				updateSocialComponent(comp, socialData.(string))
+			}
+		}
+		content[i] = comp
+	}
+
+	qrCode["content"] = content
+	qrCodes[0] = qrCode
+	templateData["qr_codes"] = qrCodes
+
+	return templateData
+}
+
+func updateProfileComponent(comp map[string]interface{}, profileData string) {
+	// Try to parse JSON response from LLaMA
+	var parsed map[string]interface{}
+	if err := json.Unmarshal([]byte(profileData), &parsed); err == nil {
+		if name, ok := parsed["name"].(string); ok && name != "" {
+			comp["name"] = name
+		}
+		if title, ok := parsed["title"].(string); ok && title != "" {
+			comp["desc"] = title
+		}
+		if company, ok := parsed["company"].(string); ok && company != "" {
+			comp["company"] = company
+		}
+		
+		// Update contact shortcuts
+		if shortcuts, ok := comp["contact_shortcuts"].([]interface{}); ok {
+			for _, shortcut := range shortcuts {
+				sc := shortcut.(map[string]interface{})
+				scType := sc["type"].(string)
+				
+				if scType == "mobile" && parsed["mobile"] != nil {
+					sc["value"] = parsed["mobile"]
+				} else if scType == "email" && parsed["email"] != nil {
+					sc["value"] = parsed["email"]
+				}
+			}
+		}
+	}
+}
+
+func updateAboutComponent(comp map[string]interface{}, aboutData string) {
+	// Clean up the response and use it as description
+	cleanDesc := strings.TrimSpace(aboutData)
+	if len(cleanDesc) > 0 {
+		comp["desc"] = cleanDesc
+	}
+}
+
+func updateContactComponent(comp map[string]interface{}, contactData string) {
+	var parsed map[string]interface{}
+	if err := json.Unmarshal([]byte(contactData), &parsed); err == nil {
+		if contactInfos, ok := comp["contact_infos"].([]interface{}); ok {
+			for _, info := range contactInfos {
+				contactInfo := info.(map[string]interface{})
+				infoType := contactInfo["type"].(string)
+				
+				switch infoType {
+				case "number":
+					if mobile, ok := parsed["mobile"].(string); ok && mobile != "" {
+						contactInfo["number"] = mobile
+					}
+				case "email":
+					if email, ok := parsed["email"].(string); ok && email != "" {
+						contactInfo["email"] = email
+					}
+				case "address":
+					if address, ok := parsed["address"].(map[string]interface{}); ok {
+						if city, ok := address["city"].(string); ok {
+							contactInfo["city"] = city
+						}
+						if country, ok := address["country"].(string); ok {
+							contactInfo["country"] = country
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func updateSocialComponent(comp map[string]interface{}, socialData string) {
+	var parsed []map[string]interface{}
+	if err := json.Unmarshal([]byte(socialData), &parsed); err == nil {
+		if links, ok := comp["links"].([]interface{}); ok {
+			for i, link := range links {
+				linkMap := link.(map[string]interface{})
+				linkType := linkMap["type"].(string)
+				
+				// Find matching social link from parsed data
+				for _, socialLink := range parsed {
+					if platform, ok := socialLink["platform"].(string); ok && platform == linkType {
+						if url, ok := socialLink["url"].(string); ok && url != "" {
+							linkMap["url"] = url
+						}
+						break
+					}
+				}
+				links[i] = linkMap
+			}
+		}
+	}
+}
+
+func handle(w http.ResponseWriter, r *http.Request) {
+	setupCORS(w)
+
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, `{"error": "Only POST method allowed"}`, http.StatusMethodNotAllowed)
+		return
+	}
+
+	var userInput UserPrompt
+	if err := json.NewDecoder(r.Body).Decode(&userInput); err != nil {
+		http.Error(w, `{"error": "Invalid JSON input"}`, http.StatusBadRequest)
+		return
+	}
+
+	if userInput.Prompt == "" || userInput.User == "" {
+		http.Error(w, `{"error": "Prompt and user fields are required"}`, http.StatusBadRequest)
+		return
+	}
+
+	filename := userInput.User + ".txt"
+	userData := ReadFile(filename)
+
+	if userData == "" {
+		http.Error(w, `{"error": "No user data found"}`, http.StatusNotFound)
+		return
+	}
+
+	// Process data in components using goroutines
+	componentData, err := processUserDataInComponents(userData, userInput.Prompt)
+	if err != nil {
+		http.Error(w, `{"error": "Failed to process user data"}`, http.StatusInternalServerError)
+		return
+	}
+
+	// Build the digital card response
+	digitalCard := buildDigitalCardResponse(componentData)
+	if digitalCard == nil {
+		http.Error(w, `{"error": "Failed to build digital card"}`, http.StatusInternalServerError)
+		return
+	}
+
+	// Store the updated user data
+	if userInput.Prompt != "" {
+		WriteFile(filename, "Updated with: "+userInput.Prompt)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(digitalCard)
+}
+
+func queryLLaMA(prompt string) (string, error) {
+	url := "http://localhost:11434/api/generate"
+
+	requestBody, err := json.Marshal(OllamaRequest{
+		Model:  "llama3.2:1b",
+		Prompt: prompt,
+		Stream: false,
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal request: %v", err)
+	}
+
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody))
+	if err != nil {
+		return "", fmt.Errorf("error making request to ollama: %v", err)
+	}
+	defer resp.Body.Close()
+
+	var ollamaResp OllamaResponse
+	if err := json.NewDecoder(resp.Body).Decode(&ollamaResp); err != nil {
+		return "", fmt.Errorf("failed to decode ollama response: %v", err)
+	}
+
+	return ollamaResp.Response, nil
+}
+
+func userhandle(w http.ResponseWriter, r *http.Request) {
+	setupCORS(w)
+
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, `{"error": "Only POST method allowed"}`, http.StatusMethodNotAllowed)
+		return
+	}
+
+	var u User
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		http.Error(w, `{"error": "Invalid JSON input"}`, http.StatusBadRequest)
+		return
+	}
+
+	if u.User == "" {
+		http.Error(w, `{"error": "User field is required"}`, http.StatusBadRequest)
+		return
+	}
+
+	filename := u.User + ".txt"
+	data := ReadFile(filename)
+
+	if data != "" {
+		greetingPrompt := data + " Based on this user data, generate a personalized greeting message. Keep it brief and professional."
+		
+		// Limit prompt size for ollama 3.2:1b
+		if len(greetingPrompt) > 1000 {
+			greetingPrompt = greetingPrompt[:1000] + "..."
+		}
+
+		res, err := queryLLaMA(greetingPrompt)
+		if err != nil {
+			http.Error(w, `{"error": "LLaMA internal server error"}`, http.StatusInternalServerError)
+			return
+		}
+
+		response := map[string]string{
+			"greeting": res,
+			"user":     u.User,
+		}
+		
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	http.Error(w, `{"error": "No user data found"}`, http.StatusNotFound)
+}
+
+func main() {
+	http.HandleFunc("/prompt", handle)
+	http.HandleFunc("/user", userhandle)
+	
+	port := "5000"
+	fmt.Printf("Server starting on port %s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
