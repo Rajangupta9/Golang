@@ -87,15 +87,16 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	}
 	filename := userInput.User + ".txt"
 	data := ReadFile(filename)
+    
+	// fmt.Println(data)
 
-	template := ReadFile("tempplate.json")
-	fullPrompt := userInput.Prompt + data + template
+	template := ReadFile("template.json")
 
-	isWrite := WriteFile(filename, userInput.Prompt)
+	// var jsonTemplate map[string]interface{}
+	// json.Unmarshal([]byte(template), &jsonTemplate)
 
-	if !isWrite {
-		http.Error(w, "user file didn't create", http.StatusInternalServerError)
-	}
+	// fmt.Println(jsonTemplate)
+	fullPrompt := data + userInput.Prompt + template
 
 	response, err := queryLLaMA(fullPrompt)
 	if err != nil {
@@ -113,7 +114,7 @@ func queryLLaMA(fullPrompt string) (string, error) {
 	url := "http://localhost:11434/api/generate"
 
 	requestBody, err := json.Marshal(OllamaRequest{
-		Model:  "llama3.2:1b",
+		Model:  "llama3",
 		Prompt: fullPrompt,
 		Stream: false,
 	})

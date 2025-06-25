@@ -1,7 +1,7 @@
 Rajan Gupta
 Node JS Developer
 
-R rajang797@gmail.com Ó +91-9709590075 1⁄2 Bengaluru, India  GitHub  ̄ LinkedIn
+rajang797@gmail.com Ó +91-9709590075 1⁄2 Bengaluru, India  GitHub  ̄ LinkedIn
 Professional Summary
 
 Adaptable Node.js developer with strong JavaScript expertise in building robust server-side applica-
@@ -47,10 +47,3 @@ security of the chat application.
 Tech Stack: JavaScript, Node.js, HTML5, CSS3, Express.js, Socket.IO
 Interests
 Strategic online gaming • Esports and competitive gaming • Open source contribution • Technology
-create json data formate for my info
-create json data formate for my info
-create json data formate for my info
-create json data formate for my info tn this templatate 
-create json data formate for my info tn this templatate sama to same don't change any things if any specific field not present then take it as it is strictly follow thise templatate 
-create json data formate for my info tn this templatate sama to same don't change any things if any specific field not present then take it as it is strictly follow thise templatate 
-create json data formate for my info tn this templatate sama to same don't change any things if any specific field not present then take it as it is strictly follow thise templatate 
