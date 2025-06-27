@@ -1,0 +1,49 @@
+Rajan Gupta
+Node JS Developer
+
+name:-rajang797@gmail.com mobileno:-+91-9709590075 addres:-1⁄2 Bengaluru, India  social:-GitHub  ̄ LinkedIn
+Professional Summary
+
+decprition :- Adaptable Node.js developer with strong JavaScript expertise in building robust server-side applica-
+tions. Skilled in Generative AI integration and quick adoption of new technologies to enhance backend
+
+performance. Proven ability to collaborate with cross-functional teams to optimize backend solutions
+and deliver high-quality software products.
+Education
+• Full Stack Web Development August 2024 - Present
+Masai School Bengaluru, India
+• B -Tech, Computer Science August 2020 - July 2024
+Techno International Newtown Kolkata, India
+Soft Skills
+Problem Solving, Time Management, Teamwork, Communication
+Technical Skills
+Backend: Node.js, Express.js, MongoDB, RESTful APIs, Authentication (JWT, OAuth)
+Frontend: HTML5, CSS3, JavaScript, Responsive Web Design
+Other: TypeScript, System Design, OOPs Java, Git
+Achievements
+LeetCode: 250+ problems solved in Data Structures & Algorithms — Profile Link
+Other Platforms: 400+ challenges completed on GeeksforGeeks, HackerRank, and Codeforces
+Projects
+• Travel Budget Live Demo — GitHub
+
+– Developed server-side logic and APIs using Node.js to handle expense tracking and budget manage-
+ment functionalities.
+
+– Integrated MongoDB to store and manage travel budget data efficiently, ensuring quick data retrieval
+and updates.
+– Implemented JWT authentication to secure user accounts and transactions within the application.
+– Collaborated with React.js frontend, enabling real-time collaboration features for users.
+– Optimized backend performance and scalability to handle multiple user requests and large data sets.
+Tech Stack: React.js, Node.js, MongoDB, Express.js
+• Real Time Chat Live Demo — GitHub
+– Collaborated with frontend developers to integrate real-time chat features using Socket.IO and
+Node.js for seamless user interaction.
+– Designed and developed server-side applications with Express.js to handle user registration and
+message broadcasting efficiently.
+– Implemented and maintained RESTful APIs to support group and private messaging functionalities
+with real-time updates.
+– Optimized WebSocket transport and server configurations to ensure performance, scalability, and
+security of the chat application.
+Tech Stack: JavaScript, Node.js, HTML5, CSS3, Express.js, Socket.IO
+Interests
+Strategic online gaming • Esports and competitive gaming • Open source contribution • Technology

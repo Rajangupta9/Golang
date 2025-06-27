@@ -1,0 +1,288 @@
+
+[
+    {
+        "component": "profile",
+        "card_background": 0,
+        "card_enable": 1,
+        "card_open": 1,
+        "_id": "uFpMGYHp1750825849079H",
+        "pr_img": "https://www.qrcodechimp.com/images/digitalCard/dbcv2/profile_1.webp?v=1750825849004",
+        "name": "Rajan ",
+        "name_config": {},
+        "desc": "Mr",
+        "desc_config": {},
+        "company": "Tez Minds",
+        "contact_shortcut_enable": 1,
+        "enable_pr": 1,
+        "contact_shortcuts": [
+            {
+                "_id": "woMsSJ9x17508258490051",
+                "type": "mobile",
+                "type_config": {},
+                "value": "9709590075",
+                "value_config": {}
+            },
+            {
+                "_id": "3xyoEBz117508258490052",
+                "type": "email",
+                "type_config": {},
+                "value": "rajang797@gmail.com",
+                "value_config": {}
+            },
+            {
+                "_id": "92zAMWLI17508258490053",
+                "type": "sms",
+                "type_config": {},
+                "value": "9709590075",
+                "value_config": {}
+            }
+        ],
+        "show_brand_img": 1,
+        "enable_br": 1,
+        "br_img": "https://www.qrcodechimp.com/images/digitalCard/dbcv2/barand_logo_9.webp?v=1750825849004"
+    },
+    {
+        "component": "text_desc",
+        "title": "About Me",
+        "desc": "Description",
+        "title_config": {
+            "bold": 1,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "desc_config": {
+            "bold": 0,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "_id": "QUtpTNrB1750825849079L",
+        "card_enable": 1
+    },
+    {
+        "component": "contact",
+        "contact_title": "Contact Us",
+        "icon_img": "/images/digitalCard/contactus.png",
+        "floating_button_enable": 1,
+        "floating_button_label": "Add to Contact",
+        "ebusiness_card_enable": 1,
+        "contact_infos": [
+            {
+                "type": "number",
+                "title": "Call Us",
+                "label": "Mobile ",
+                "number": "123 456 7890",
+                "_id": "60jggoha1750825849079N"
+            },
+            {
+                "type": "email",
+                "title": "Email",
+                "label": "Email ",
+                "email": "contactme@domain.com",
+                "_id": "ziyf6bLt1750825849079O"
+            },
+            {
+                "type": "address",
+                "title": "Address",
+                "street": "Street",
+                "city": "City",
+                "country": "Country",
+                "state": "State",
+                "zip": "Zipcode",
+                "action_button_enable": 1,
+                "action_button_label": "Direction",
+                "action_button_link": "#",
+                "_id": "ndD3M75Y1750825849079P"
+            }
+        ],
+        "_id": "2p9TJT6q1750825849079M",
+        "card_enable": 1
+    },
+    {
+        "component": "images",
+        "header_enable": 0,
+        "title": "",
+        "desc": "",
+        "title_config": {
+            "bold": 1,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "desc_config": {
+            "bold": 0,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "view_type": "list",
+        "images": [
+            "/images/digitalCard/image_1.png",
+            "/images/digitalCard/image_2.png",
+            "/images/digitalCard/image_1.png",
+            "/images/digitalCard/image_2.png"
+        ],
+        "_id": "mhqSEqL11750825849079Q",
+        "card_enable": 1
+    },
+    {
+        "component": "social_link",
+        "header_enable": 1,
+        "title": "Social Links",
+        "desc": "Description",
+        "title_config": {
+            "bold": 1,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "desc_config": {
+            "bold": 0,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "links": [
+            {
+                "type": "facebook",
+                "url": "",
+                "title": "Facebook",
+                "subtitle": "Follow us on Facebook",
+                "subtitle_enable": 1,
+                "icon_img": "/images/digitalCard/fb_icon@72x.png",
+                "_id": "3uQie4Y91750825849080S"
+            },
+            {
+                "type": "instagram",
+                "url": "",
+                "title": "Instagram",
+                "subtitle": "Follow us on Instagram",
+                "subtitle_enable": 0,
+                "icon_img": "/images/digitalCard/insta_icon@72x.png",
+                "_id": "VL4W2Xnt1750825849080T"
+            },
+            {
+                "type": "twitter",
+                "url": "",
+                "title": "Twitter",
+                "subtitle": "Follow us on Twitter",
+                "subtitle_enable": 0,
+                "icon_img": "/images/digitalCard/tw_icon@72x.png",
+                "_id": "Jkyh7VyZ1750825849080U"
+            }
+        ],
+        "_id": "M8CTSg2A1750825849079R",
+        "card_enable": 1
+    },
+    {
+        "component": "web_links",
+        "header_enable": 1,
+        "title": "Web Links",
+        "desc": "Description",
+        "title_config": {
+            "bold": 1,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "desc_config": {
+            "bold": 0,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "links": [
+            {
+                "url": "https://www.mycoolbrand.com",
+                "title": "Title",
+                "subtitle": "Sub Title",
+                "subtitle_enable": 1,
+                "icon_img": "/images/digitalCard/weblink.png",
+                "_id": "f7ZG9Fxq1750825849080W"
+            }
+        ],
+        "_id": "EtyUyAYA1750825849080V",
+        "card_enable": 1
+    },
+    {
+        "component": "appointment",
+        "header_enable": 1,
+        "title": "Schedule Meeting",
+        "desc": "Schedule a meeting to discuss potential opportunities for collaboration",
+        "title_config": {
+            "bold": 1,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "desc_config": {
+            "bold": 0,
+            "italic": 0,
+            "align": "center",
+            "lock": "unlock"
+        },
+        "appointments": [
+            {
+                "link": "",
+                "label": "Book on Calendly"
+            },
+            {
+                "link": "",
+                "label": "Add to Calendar"
+            }
+        ],
+        "card_enable": 1,
+        "_id": "sOOYMPOD1750825849080X"
+    },
+    {
+        "component": "form",
+        "card_label": "Collect Contacts",
+        "card_delete_disabled": 1,
+        "card_enable": 0,
+        "card_desc": "Enable this feature to collect your prospect's contact details",
+        "form_name": "Contact Collection",
+        "form_config": [
+            {
+                "header": {
+                    "title": "Hi, great to connect with you!",
+                    "desc": "Please provide the information below to proceed further",
+                    "header_enable": 1
+                },
+                "enable_header_img": 1,
+                "header_img": "/images/defaultImages/businesspage/b_brand_logo.png",
+                "form_fields": [
+                    {
+                        "type": "oneLine",
+                        "label": "Your Name",
+                        "required": true,
+                        "_id": "sg7CjRcf1750825849010D"
+                    },
+                    {
+                        "type": "email",
+                        "label": "Your Email",
+                        "required": true,
+                        "_id": "7plFZYz31750825849010E"
+                    },
+                    {
+                        "type": "tel",
+                        "label": "Your Phone",
+                        "required": true,
+                        "_id": "TSlYbths1750825849010F"
+                    }
+                ],
+                "button_label": "Submit",
+                "terms_label": "I agree to Terms and Privacy Policy"
+            }
+        ],
+        "view_config": {
+            "delay_time": "1",
+            "dismiss_form": 1,
+            "form_trigger": "delay",
+            "form_view": "full",
+            "view_type": "overlay"
+        },
+        "form_integration": {},
+        "_id": "rfwgQgSc1750825849080Y"
+    }
+]

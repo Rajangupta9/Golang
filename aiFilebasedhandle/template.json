@@ -1,0 +1,266 @@
+{
+    "template_id": "b_685bb94064ea9b78d567cade",
+    "qr_codes": [
+        {
+            "qr_name": "",
+            "short_url": "",
+            "content": [
+                {
+                    "component": "profile",
+                    "pr_img": "/images/digitalCard/dbcv2/profile_1.webp",
+                    "br_img": "/images/digitalCard/dbcv2/barand_logo_9.webp",
+                    "name": "INSERT_FULL_NAME",
+                    "desc": "INSERT_JOB_TITLE",
+                    "company": "INSERT_COMPANY_NAME",
+                    "contact_shortcuts": [
+                        {
+                            "type": "mobile",
+                            "value": "INSERT_PHONE_NUMBER"
+                        },
+                        {
+                            "type": "email",
+                            "value": "INSERT_EMAIL_ADDRESS"
+                        },
+                        {
+                            "type": "sms",
+                            "value": "INSERT_SMS_NUMBER"
+                        }
+                    ]
+                },
+                {
+                    "component": "text_desc",
+                    "title": "About Me",
+                    "desc": "INSERT_ABOUT_DESCRIPTION",
+                    "title_config": {
+                        "bold": 1,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    },
+                    "desc_config": {
+                        "bold": 0,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    }
+                },
+                {
+                    "component": "contact",
+                    "contact_title": "Contact Me",
+                    "icon_img": "/images/digitalCard/contactus.png",
+                    "floating_button_label": "Add to Contact",
+                    "ebusiness_card_enable": 1,
+                    "contact_infos": [
+                        {
+                            "type": "number",
+                            "title": "Call Me",
+                            "label": "Mobile ",
+                            "number": "INSERT_CONTACT_PHONE"
+                        },
+                        {
+                            "type": "email",
+                            "title": "Email",
+                            "label": "Email ",
+                            "email": "INSERT_CONTACT_EMAIL"
+                        },
+                        {
+                            "type": "address",
+                            "title": "Address",
+                            "street": "INSERT_STREET_ADDRESS",
+                            "city": "INSERT_CITY",
+                            "country": "INSERT_COUNTRY",
+                            "state": "INSERT_STATE",
+                            "zip": "INSERT_ZIP_CODE",
+                            "action_button_label": "Get Directions",
+                            "action_button_link": "#"
+                        }
+                    ]
+                },
+                {
+                    "component": "images",
+                    "title": "INSERT_GALLERY_TITLE",
+                    "desc": "INSERT_GALLERY_DESCRIPTION",
+                    "title_config": {
+                        "bold": 1,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    },
+                    "desc_config": {
+                        "bold": 0,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    },
+                    "view_type": "list",
+                    "images": [
+                        "/images/digitalCard/image_1.png",
+                        "/images/digitalCard/image_2.png",
+                        "/images/digitalCard/image_1.png",
+                        "/images/digitalCard/image_2.png"
+                    ]
+                },
+                {
+                    "component": "social_link",
+                    "title": "Connect With Me",
+                    "desc": "INSERT_SOCIAL_DESCRIPTION",
+                    "title_config": {
+                        "bold": 1,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    },
+                    "desc_config": {
+                        "bold": 0,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    },
+                    "links": [
+                        {
+                            "type": "facebook",
+                            "url": "INSERT_FACEBOOK_URL",
+                            "title": "Facebook",
+                            "subtitle": "Connect on Facebook",
+                            "icon_img": "/images/digitalCard/fb_icon@72x.png"
+                        },
+                        {
+                            "type": "instagram",
+                            "url": "INSERT_INSTAGRAM_URL",
+                            "title": "Instagram",
+                            "subtitle": "Follow on Instagram",
+                            "icon_img": "/images/digitalCard/insta_icon@72x.png"
+                        },
+                        {
+                            "type": "twitter",
+                            "url": "INSERT_TWITTER_URL",
+                            "title": "Twitter",
+                            "subtitle": "Follow on Twitter",
+                            "icon_img": "/images/digitalCard/tw_icon@72x.png"
+                        },
+                        {
+                            "type": "linkedin",
+                            "url": "INSERT_LINKEDIN_URL",
+                            "title": "LinkedIn",
+                            "subtitle": "Connect professionally",
+                            "icon_img": "/images/digitalCard/linkedin_icon@72x.png"
+                        },
+                        {
+                            "type": "github",
+                            "url": "INSERT_GITHUB_URL",
+                            "title": "GitHub",
+                            "subtitle": "View my code",
+                            "icon_img": "/images/digitalCard/github_icon@72x.png"
+                        }
+                    ]
+                },
+                {
+                    "component": "web_links",
+                    "title": "My Work & Projects",
+                    "desc": "INSERT_PORTFOLIO_DESCRIPTION",
+                    "title_config": {
+                        "bold": 1,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    },
+                    "desc_config": {
+                        "bold": 0,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    },
+                    "links": [
+                        {
+                            "url": "INSERT_WEBSITE_URL",
+                            "title": "INSERT_WEBSITE_TITLE",
+                            "subtitle": "INSERT_WEBSITE_SUBTITLE",
+                            "icon_img": "/images/digitalCard/weblink.png"
+                        },
+                        {
+                            "url": "INSERT_PORTFOLIO_URL",
+                            "title": "INSERT_PORTFOLIO_TITLE",
+                            "subtitle": "INSERT_PORTFOLIO_SUBTITLE",
+                            "icon_img": "/images/digitalCard/weblink.png"
+                        }
+                    ]
+                },
+                {
+                    "component": "appointment",
+                    "title": "Schedule Meeting",
+                    "desc": "INSERT_MEETING_DESCRIPTION",
+                    "title_config": {
+                        "bold": 1,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    },
+                    "desc_config": {
+                        "bold": 0,
+                        "italic": 0,
+                        "align": "center",
+                        "lock": "unlock"
+                    },
+                    "appointments": [
+                        {
+                            "link": "INSERT_CALENDLY_LINK",
+                            "label": "Book on Calendly"
+                        },
+                        {
+                            "link": "INSERT_CALENDAR_LINK",
+                            "label": "Add to Calendar"
+                        }
+                    ]
+                },
+                {
+                    "component": "form",
+                    "card_label": "Collect Contacts",
+                    "card_delete_disabled": 1,
+                    "card_desc": "Enable this feature to collect your prospect's contact details",
+                    "form_name": "Contact Collection",
+                    "form_config": [
+                        {
+                            "header": {
+                                "title": "INSERT_FORM_HEADER_TITLE",
+                                "desc": "INSERT_FORM_HEADER_DESCRIPTION",
+                                "header_enable": 1
+                            },
+                            "enable_header_img": 1,
+                            "header_img": "/images/defaultImages/businesspage/b_brand_logo.png",
+                            "form_fields": [
+                                {
+                                    "type": "oneLine",
+                                    "label": "Your Name",
+                                    "required": true,
+                                    "_id": "m5jMN0971750841633067D"
+                                },
+                                {
+                                    "type": "email",
+                                    "label": "Your Email",
+                                    "required": true,
+                                    "_id": "8gWDWfpY1750841633067E"
+                                },
+                                {
+                                    "type": "tel",
+                                    "label": "Your Phone",
+                                    "required": true,
+                                    "_id": "y4zLRmhk1750841633067F"
+                                }
+                            ],
+                            "button_label": "Submit",
+                            "terms_label": "I agree to Terms and Privacy Policy"
+                        }
+                    ],
+                    "view_config": {
+                        "delay_time": "1",
+                        "dismiss_form": 1,
+                        "form_trigger": "delay",
+                        "form_view": "full",
+                        "view_type": "overlay"
+                    },
+                    "form_integration": []
+                }
+            ]
+        }
+    ]
+}
