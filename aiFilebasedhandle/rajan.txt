@@ -1,49 +1,63 @@
-Rajan Gupta
-Node JS Developer
-
-name:-rajang797@gmail.com mobileno:-+91-9709590075 addres:-1⁄2 Bengaluru, India  social:-GitHub  ̄ LinkedIn
-Professional Summary
-
-decprition :- Adaptable Node.js developer with strong JavaScript expertise in building robust server-side applica-
-tions. Skilled in Generative AI integration and quick adoption of new technologies to enhance backend
-
-performance. Proven ability to collaborate with cross-functional teams to optimize backend solutions
-and deliver high-quality software products.
+Contact
+www.linkedin.com/in/kaushalvish
+(LinkedIn)
+hellokaushal750.github.io/
+(Portfolio)
+Kaushal Vishwakarma
+Software Developer
+Mumbai, Maharashtra, India
+Summary
+Top SkillsHello,
+Go (Programming Language)After 12th I decided to do engineering in IT, but just because of 2
+marks less in entrance exam(CET)
+I was not eligible to get the admission in IT and I ended up getting
+admission in Mechanical.
+Mechanical became much interesting field for me to built the
+analytical skill. During college I came across
+machine design software's like AutoCAD and Solid works. I was only
+in my 2nd year when the pandemic broke and the entire nation and
+world went into a lockdown. That gave me plenty of time to explore
+new things and enhance my creativity. It led me to explore design.
+So I joined Milestone Institute to learn AutoCAD and Solid works.
+MySQL
+Next.js
+Languages
+Hindi (Native or Bilingual)
+English (Full Professional)
+Certifications
+Arduino
+Zoom Marathon Challenge
+AutoCad
+But because of pandemic I didn't have much knowledge about
+practical work and also there was not higher chances of job in
+Mechanical. I decided to switch my career as web developer, I have
+always interested in IT field.
+After my graduation I was eagerly searching for a good web
+development course and I came across an advertisement and
+when I did some research about the institute, I found the course
+really interesting. Soon after I enrolled myself in full stack web
+development course (by Masai School).
+Currently I am working as Software Developer in Tezminds.
+Experience
+TezMinds Software Pvt. Ltd.
+Software Developer
+September 2023 - Present (1 year 10 months)
+Pune, Maharashtra, India
+Page 1 of 2IKS Health
+Junior Revenue Cycle Representative
+June 2022 - September 2022 (4 months)
+Navi Mumbai, Maharashtra, India
+My first job after graduation was in IKS Health as a Junior revenue cycle
+representative. It was a great experience to be a part of it. Learned basic of
+about how health insurance works in the US. IKS Health is a company that
+helps US doctors to get their payment from health insurance. I realized that
+my strengths and weaknesses were not aligned with the requirements of the
+post. I decided it was best that I left at the earliest and started to hunt for more
+relevant opportunities.
 Education
-• Full Stack Web Development August 2024 - Present
-Masai School Bengaluru, India
-• B -Tech, Computer Science August 2020 - July 2024
-Techno International Newtown Kolkata, India
-Soft Skills
-Problem Solving, Time Management, Teamwork, Communication
-Technical Skills
-Backend: Node.js, Express.js, MongoDB, RESTful APIs, Authentication (JWT, OAuth)
-Frontend: HTML5, CSS3, JavaScript, Responsive Web Design
-Other: TypeScript, System Design, OOPs Java, Git
-Achievements
-LeetCode: 250+ problems solved in Data Structures & Algorithms — Profile Link
-Other Platforms: 400+ challenges completed on GeeksforGeeks, HackerRank, and Codeforces
-Projects
-• Travel Budget Live Demo — GitHub
-
-– Developed server-side logic and APIs using Node.js to handle expense tracking and budget manage-
-ment functionalities.
-
-– Integrated MongoDB to store and manage travel budget data efficiently, ensuring quick data retrieval
-and updates.
-– Implemented JWT authentication to secure user accounts and transactions within the application.
-– Collaborated with React.js frontend, enabling real-time collaboration features for users.
-– Optimized backend performance and scalability to handle multiple user requests and large data sets.
-Tech Stack: React.js, Node.js, MongoDB, Express.js
-• Real Time Chat Live Demo — GitHub
-– Collaborated with frontend developers to integrate real-time chat features using Socket.IO and
-Node.js for seamless user interaction.
-– Designed and developed server-side applications with Express.js to handle user registration and
-message broadcasting efficiently.
-– Implemented and maintained RESTful APIs to support group and private messaging functionalities
-with real-time updates.
-– Optimized WebSocket transport and server configurations to ensure performance, scalability, and
-security of the chat application.
-Tech Stack: JavaScript, Node.js, HTML5, CSS3, Express.js, Socket.IO
-Interests
-Strategic online gaming • Esports and competitive gaming • Open source contribution • Technology
+Masai
+Full Stack Web Development, Information Technology · (September
+2022 - July 2023)
+Thakur College of Engineering & Technology
+BE, Mechanical Engineering · (2018 - 2022)
+Page 2 of 2

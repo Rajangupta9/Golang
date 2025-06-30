@@ -1,3 +1,8 @@
+
+
+
+
+
 {
     "template_id": "b_685bb94064ea9b78d567cade",
     "qr_codes": [
@@ -137,20 +142,6 @@
                             "title": "Twitter",
                             "subtitle": "Follow on Twitter",
                             "icon_img": "/images/digitalCard/tw_icon@72x.png"
-                        },
-                        {
-                            "type": "linkedin",
-                            "url": "INSERT_LINKEDIN_URL",
-                            "title": "LinkedIn",
-                            "subtitle": "Connect professionally",
-                            "icon_img": "/images/digitalCard/linkedin_icon@72x.png"
-                        },
-                        {
-                            "type": "github",
-                            "url": "INSERT_GITHUB_URL",
-                            "title": "GitHub",
-                            "subtitle": "View my code",
-                            "icon_img": "/images/digitalCard/github_icon@72x.png"
                         }
                     ]
                 },
@@ -175,12 +166,6 @@
                             "url": "INSERT_WEBSITE_URL",
                             "title": "INSERT_WEBSITE_TITLE",
                             "subtitle": "INSERT_WEBSITE_SUBTITLE",
-                            "icon_img": "/images/digitalCard/weblink.png"
-                        },
-                        {
-                            "url": "INSERT_PORTFOLIO_URL",
-                            "title": "INSERT_PORTFOLIO_TITLE",
-                            "subtitle": "INSERT_PORTFOLIO_SUBTITLE",
                             "icon_img": "/images/digitalCard/weblink.png"
                         }
                     ]

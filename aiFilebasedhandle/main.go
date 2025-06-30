@@ -1,7 +1,6 @@
 package main
 
 import (
-	readpdf "ai/readPdf"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -27,7 +26,7 @@ type User struct {
 }
 
 func ReadFile(filename string) string {
-	data, err := os.ReadFile(filename +".txt")
+	data, err := os.ReadFile(filename + ".txt")
 	if err != nil {
 		return ""
 	}
@@ -35,7 +34,7 @@ func ReadFile(filename string) string {
 }
 
 func WriteFile(filename string, data string) bool {
-     filename = filename + ".txt"
+	filename = filename + ".txt"
 	prevData := ReadFile(filename)
 
 	file, err := os.Create(filename)
@@ -122,19 +121,19 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "promp and user are empty", http.StatusBadRequest)
 		return
 	}
-	filename := userInput.User 
-	data, err := readpdf.ReadPDFAsString(filename)
+	filename := userInput.User
+	data := ReadFile(filename)
 
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "user file not read ", http.StatusInternalServerError)
-		return
-	}
-	fmt.Println(data + "this is data")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	http.Error(w, "user file not read ", http.StatusInternalServerError)
+	// 	return
+	// }
+	// fmt.Println(data + "this is data")
 
 	// fmt.Println(data)
 
-	template := ReadFile("template.json")
+	template := ReadFile("template")
 
 	// var jsonTemplate map[string]interface{}
 	// json.Unmarshal([]byte(template), &jsonTemplate)
@@ -155,10 +154,11 @@ func handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func queryLLaMA(fullPrompt string) (string, error) {
+	// fmt.Println(fullPrompt)
 	url := "http://localhost:11434/api/generate"
 
 	requestBody, err := json.Marshal(OllamaRequest{
-		Model:  "llama3.2:1b",
+		Model:  "llama3",
 		Prompt: fullPrompt,
 		Stream: false,
 	})
