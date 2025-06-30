@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type OllamaRequest struct {
@@ -149,6 +150,19 @@ func handle(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(response)
 
+	clean := strings.TrimSpace(response)
+	clean = strings.TrimPrefix(clean, "```")
+	clean = strings.TrimSuffix(clean, "```")
+	clean = strings.TrimSpace(clean)
+
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(clean), &result)
+	if err != nil {
+		fmt.Println("Error:", err)
+
+	}
+	fmt.Println(result["template_id"])
+
 	json.NewEncoder(w).Encode(response)
 
 }
@@ -158,7 +172,7 @@ func queryLLaMA(fullPrompt string) (string, error) {
 	url := "http://localhost:11434/api/generate"
 
 	requestBody, err := json.Marshal(OllamaRequest{
-		Model:  "llama3",
+		Model:  "llama3.2:1b",
 		Prompt: fullPrompt,
 		Stream: false,
 	})
@@ -235,5 +249,6 @@ func main() {
 	http.HandleFunc("/user", userhandle)
 	var Port string = "5000"
 	fmt.Printf("sever start on port %s", Port)
+	fmt.Println("")
 	log.Fatal(http.ListenAndServe(":"+Port, nil))
 }

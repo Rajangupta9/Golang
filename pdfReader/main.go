@@ -57,71 +57,71 @@
 // }
 
 
-// package main
-
-// import (
-// 	"fmt"
-// 	"os/exec"
-// )
-
-// func ReadPDFWithPython(filename string) (string, error) {
-// 	cmd := exec.Command("python3", "extract.py", filename)
-// 	out, err := cmd.Output()
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	return string(out), nil
-// }
-
-// func main() {
-// 	text, err := ReadPDFWithPython("sample.pdf")
-// 	if err != nil {
-// 		fmt.Println("Error:", err)
-// 		return
-// 	}
-// 	fmt.Println("Extracted PDF Content:\n")
-// 	fmt.Println(text)
-// }
-
-
 package main
 
 import (
 	"fmt"
-	"log"
-	"os"
-
-	"rsc.io/pdf"
+	"os/exec"
 )
 
-func ReadPDFAsString(filename string) string {
-	f, err := os.Open(filename)
+func ReadPDFWithPython(filename string) (string, error) {
+	cmd := exec.Command("python3", "extract.py", filename)
+	out, err := cmd.Output()
 	if err != nil {
-		log.Fatalf("Error opening PDF file: %v", err)
+		return "", err
 	}
-	defer f.Close()
-
-	r, err := pdf.NewReader(f, -1)
-	if err != nil {
-		log.Fatalf("Error reading PDF: %v", err)
-	}
-
-	var text string
-	for i := 1; i <= r.NumPage(); i++ {
-		page := r.Page(i)
-		if page.V.IsNull() {
-			continue
-		}
-		content := page.Content()
-		for _, textObj := range content.Text {
-			text += textObj.S
-		}
-	}
-
-	return text
+	return string(out), nil
 }
 
 func main() {
-	text := ReadPDFAsString("sample.pdf")
+	text, err := ReadPDFWithPython("sample.pdf")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("Extracted PDF Content:\n")
 	fmt.Println(text)
 }
+
+
+// package main
+
+// import (
+// 	"fmt"
+// 	"log"
+// 	"os"
+
+// 	"rsc.io/pdf"
+// )
+
+// func ReadPDFAsString(filename string) string {
+// 	f, err := os.Open(filename)
+// 	if err != nil {
+// 		log.Fatalf("Error opening PDF file: %v", err)
+// 	}
+// 	defer f.Close()
+
+// 	r, err := pdf.NewReader(f, -1)
+// 	if err != nil {
+// 		log.Fatalf("Error reading PDF: %v", err)
+// 	}
+
+// 	var text string
+// 	for i := 1; i <= r.NumPage(); i++ {
+// 		page := r.Page(i)
+// 		if page.V.IsNull() {
+// 			continue
+// 		}
+// 		content := page.Content()
+// 		for _, textObj := range content.Text {
+// 			text += textObj.S
+// 		}
+// 	}
+
+// 	return text
+// }
+
+// func main() {
+// 	text := ReadPDFAsString("sample.pdf")
+// 	fmt.Println(text)
+// }
